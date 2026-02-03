@@ -23,7 +23,7 @@
 ### ROS1
 
 ```sh
-cd <ros_workspace>/catkin_ws/src
+cd <ros_workspace>/src
 git clone https://github.com/RoboSense-Robotics/Voxel-Odom
 cd ../ && catkin build -v -i
 source devel/setup.bash
