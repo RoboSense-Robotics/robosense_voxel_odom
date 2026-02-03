@@ -1,0 +1,99 @@
+General:
+  lid_topic: "/rs_lidar/points"
+  imu_topic: "/rs_imu"
+  img_topic: "/rs_camera/rgb"
+  compressed_img_topic: ""
+  # The file path of the map to be saved
+  save_path: "/home/sti/Documents/voxel_odom_ws/src/voxel_slam/VoxelSLAM/Log"
+  # The offline map in the save_path to be loaded
+  # '#' means the map is not loaded
+  previous_map: ""
+  bagname: "ac1_shuichi_map"
+  lidar_type: 4
+  blind: 0.5
+  blind_far: 300.
+  point_filter_num: 1
+
+  projection_model: "pinhole" # "pinhole", "omni"
+  distortion_model: "radtan" # "radtan", "equi", "fov"
+
+  enhance_method: "none" # "none", "histogram", "clahe"
+  num_feats: 200
+  fast_threshold: 40
+  grid_x: 10
+  grid_y: 10
+  min_px_dist: 15
+  img_scale: 0.5
+  reprojection_cov: 1.
+  vis_update_status: 2 # 0: no update, 1: update alone; 2: update combine
+  use_landmark: true
+  re_weight: false
+  border_x: 160
+  border_y: 80
+  opencv_thread_num: 4
+  plane_density: [500., 1000., 2000., 3000.]
+  scale_xy: 0.25
+  scale_z: 1.e-4
+  landmark_freeze_num: -1 # <=0 means not freeze
+  ray_tracking_all_map: false # false means use only lio res map.
+  ray_tracking_range: [-0.1, -30.0] # [min_range, max_range), < 0 means using adaptive xxx_range from lidar
+  range_search_radius: 2 # [px], <= not <, negative means this value will be calculated by slam, save different radius result in save_path/bagname/radius, and exit(1), then you need to select the best radius manually and set it to range_search_radius
+  k_no_degrade: 0.5
+  position_disable_thre_: 10.
+
+  landmark_use_dist_weight: false
+  vio_use_dist_weight: false
+  vba_use_dist_weight: false
+  max_dist_error: 3. # <0 means use all pixel
+  max_unconsistency: 3. # <0 means use all pixel
+
+  pub_dense: true
+  save_map_duration: 30000 # [s] save a map pcd every x[s], <0 means not save map, ==0 means save map pcd every frame
+
+  init_mode: "dynamic" # "static", "dynamic"
+  gravity_align_en: true # only valid when init_mode is "static"
+
+  record_memory: false
+  malloc_trim_duration: 10 # [frame] <=0 means not malloc_trim by this parameter
+  max_jour: 700 # [m] <0 means not release map by this parameter
+
+  sleep_duration: 10 # [ms] sleep time between two frames, <=0 means not sleep
+
+  boundary_point_remove: true
+
+Odometry:
+  max_iteration: 4
+  cov_gyr: 0.1
+  cov_acc: 1
+  rdw_gyr: 0.0001
+  rdw_acc: 0.0001
+  # indoor:0.1, outdoor:0.25, high altitude: 0.5
+  down_size: 0.1
+  dept_err: 0.02
+  beam_err: 0.05
+  # indoor: 0.5-1, high speed: 2, high altitude: 4
+  voxel_size: 1
+  min_eigen_value: 0.0025
+  # The number of degenrate scans to make the system reset
+  degrade_bound: -10000 # [frame] <=0 means not reset by this parameter
+  point_notime: 0
+
+LocalBA:
+  max_iteration: 3
+  win_size: 10
+  max_layer: 2
+  cov_gyr: 0.01
+  cov_acc: 1
+  rdw_gyr: 0.0001
+  rdw_acc: 0.0001
+  min_ba_point: 1
+  # The plane criterion
+  plane_eigen_value_thre: [4.0, 4.0, 4.0, 4.0]
+  imu_coef: 0.0001
+  thread_num: 5
+  enable: true
+  update_status: 2 # 0: use lidar only; 1: use visual only; 2: use both # only influence lio-update, not include lio-init
+  reporjection_coeff: 0.001 # <=0. means use obs-num of landmark as coeff
+  border_x: 160
+  border_y: 80
+  border_weight: 0 # [0,1], 0 means ignores boundary points, 1 means don't distinguish boundary points

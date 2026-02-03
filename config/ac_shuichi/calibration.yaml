@@ -1,0 +1,123 @@
+DEVICE_ID: demo
+Body:
+  base_link: base_link
+  frame: sensor
+  extrinsic:
+    translation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    quaternion:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+Sensor:
+  Lidar:
+    base_link: sensor
+    frame: lidar
+    extrinsic:
+      translation:
+        x: 0.0
+        y: 0.030219
+        z: -0.02354
+      quaternion:
+        x: 0.0
+        y: -0.0
+        z: 0.0
+        w: 1.0
+  Camera:
+    base_link: sensor
+    frame: camera
+    extrinsic:
+      translation:
+        x: -0.01
+        y: 0.02
+        z: -0.04708
+      quaternion:
+        x: 0.5000000001025516
+        y: -0.49999999979489657
+        z: 0.5000000001025517
+        w: -0.5
+    intrinsic:
+      model: Pinhole
+      int_matrix:
+      - 792.4640737604
+      - 0
+      - 965.645594
+      - 0
+      - 791.1053752151
+      - 547.250649
+      - 0
+      - 0
+      - 1
+      dist_coeff:
+      - -0.0352108256
+      - 0.147926732
+      - 1.2937e-05
+      - 0.0001654014
+      - 0.014088817
+      - 0.290436
+      - 0.095993
+      - 0.061735
+      image_size:
+      - 1920
+      - 1080
+  IMU:
+    base_link: sensor
+    frame: imu
+    extrinsic:
+      translation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+      quaternion:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        w: 1.0
+ADDTION_INFO:
+  cam_model: Pinhole
+  cam_width: 1920
+  cam_height: 1080
+  cam_fx: 792.4640737604
+  cam_fy: 791.1053752151
+  cam_cx: 965.645594
+  cam_cy: 547.250649
+  cam_d0: -0.0352108256
+  cam_d1: 0.147926732
+  cam_d2: 1.2937e-05
+  cam_d3: 0.0001654014
+  cam_d4: 0.014088817
+  cam_d5: 0.290436
+  cam_d6: 0.095993
+  cam_d7: 0.061735
+  Rcl:
+  - 2.0510342851533115e-10
+  - -1.0
+  - 4.102068570306623e-10
+  - 2.05103428599466e-10
+  - -4.102068569885949e-10
+  - -1.0
+  - 1.0
+  - 2.05103428599466e-10
+  - 2.0510342851533115e-10
+  Pcl:
+  - 0.030219000009656268
+  - -0.023539999987603956
+  - -1.3698858015963676e-12
+  extrinsic_T:
+  - 0
+  - 0.030219
+  - -0.02354
+  extrinsic_R:
+  - 1
+  - -0.0
+  - -0.0
+  - 0.0
+  - 1
+  - -0.0
+  - 0.0
+  - 0.0
+  - 1
+

@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>voxel_odom</name>
+  <version>1.0.0</version>
+  <description>A modified version of Voxel-SLAM with enhanced odometry and removed backend components, adapted for the Active Camera</description>
+  <maintainer email="silence.song@robosense.cn">Silence Song</maintainer>
+  <license>GPL-v2</license>
+
+  <buildtool_depend condition="$ROS_VERSION == '1'">catkin</buildtool_depend>
+  <buildtool_depend condition="$ROS_VERSION == '2'">ament_cmake</buildtool_depend>
+
+  <build_depend condition="$ROS_VERSION == '1'">roscpp</build_depend>
+  <build_depend condition="$ROS_VERSION == '2'">rclcpp</build_depend>
+
+  <build_depend condition="$ROS_VERSION == '1'">rospy</build_depend>
+  <build_depend condition="$ROS_VERSION == '2'">rclpy</build_depend>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <build_depend>pcl_conversions</build_depend>
+  <build_depend>pcl_ros</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>image_transport</build_depend>
+
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>visualization_msgs</exec_depend>
+  <exec_depend>pcl_conversions</exec_depend>
+  <exec_depend>pcl_ros</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>image_transport</exec_depend>
+
+  <export>
+    <build_type condition="$ROS_VERSION == '2'">ament_cmake</build_type>
+  </export>
+</package>
