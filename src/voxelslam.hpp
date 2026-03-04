@@ -97,6 +97,10 @@ bool vba_use_dist_weight{false};
 
 std::ofstream time_cost_total_;
 
+int sync_mode{0};
+bool img_enable{true};
+int img_ds_ratio{1};
+
 void imu_handler(const RosImuConstPtr &msg_in)
 {
   static int flag = 1;
@@ -152,16 +156,22 @@ void pcl_handler(const RosCloudConstPtr &msg)
 
 void monocular_handler(const RosImageConstPtr &msg) 
 {
+  if(!img_enable) return;
+  static int cnt = -1;
+  cnt++;
   auto start = std::chrono::high_resolution_clock::now();
   slam_cam::CameraData cam_data;
   cam_data.timestamp = ROS_TIMESTAMP_TO_SEC(msg->header.stamp);
   cv::Mat bgr = cv_bridge::toCvShare(msg, "bgr8")->image;
   cv::resize(bgr, bgr, cv::Size(), img_scale, img_scale, cv::INTER_LINEAR);
   
-  mBuf.lock();
-  img_time_buf.push_back(cam_data.timestamp);
-  img_buf.push_back(bgr);
-  mBuf.unlock();
+  if(0 == sync_mode || 0 == cnt % img_ds_ratio)
+  {
+    mBuf.lock();
+    img_time_buf.push_back(cam_data.timestamp);
+    img_buf.push_back(bgr);
+    mBuf.unlock();
+  }
 
   cv::Mat gray;
   cv::cvtColor(bgr, gray, CV_BGR2GRAY);
@@ -181,16 +191,22 @@ void monocular_handler(const RosImageConstPtr &msg)
 
 void monocular_compressed_handler(const RosCompressedImageConstPtr &msg) 
 {
+  if(!img_enable) return;
+  static int cnt = -1;
+  cnt++;
   auto start = std::chrono::high_resolution_clock::now();
   slam_cam::CameraData cam_data;
   cam_data.timestamp = ROS_TIMESTAMP_TO_SEC(msg->header.stamp);
   cv::Mat bgr = cv_bridge::toCvCopy(msg, "bgr8")->image;
   cv::resize(bgr, bgr, cv::Size(), img_scale, img_scale, cv::INTER_LINEAR);
   
-  mBuf.lock();
-  img_time_buf.push_back(cam_data.timestamp);
-  img_buf.push_back(bgr);
-  mBuf.unlock();
+  if(0 == sync_mode || 0 == cnt % img_ds_ratio)
+  {
+    mBuf.lock();
+    img_time_buf.push_back(cam_data.timestamp);
+    img_buf.push_back(bgr);
+    mBuf.unlock();
+  }
 
   cv::Mat gray;
   cv::cvtColor(bgr, gray, CV_BGR2GRAY);
@@ -206,6 +222,170 @@ void monocular_compressed_handler(const RosCompressedImageConstPtr &msg)
           << ",,"
           << std::to_string(cam_data.timestamp)
           << std::endl;
+}
+
+bool sync_packages_new(pcl::PointCloud<PointType>::Ptr &pl_ptr, std::deque<RosImuPtr> &imus, IMUEKF &p_imu)
+{
+  static bool pl_ready = false;
+  static bool img_ready = false;
+  if(img_enable)
+  {
+    if(!img_ready)
+    {
+      if(img_time_buf.empty()) return false;
+      if(last_pcl_time < 0)
+      {
+        mBuf.lock();
+        last_pcl_time = img_time_buf.front();
+        img_time_buf.pop_front();
+        img_buf.pop_front();
+        mBuf.unlock();
+        return false;
+      }
+      p_imu.pcl_beg_time = last_pcl_time;
+      mBuf.lock();
+      last_pcl_time = img_time_buf.front();
+      p_imu.img_match = img_buf.front();
+      img_time_buf.pop_front();
+      img_buf.pop_front();
+      mBuf.unlock();
+      p_imu.pcl_end_time = last_pcl_time;
+      p_imu.img_match_time = last_pcl_time;
+      p_imu.img_match_status = 1;
+
+      std::cout << "p_imu.pcl_beg_time:" << std::to_string(p_imu.pcl_beg_time) << ", p_imu.pcl_end_time:" << std::to_string(p_imu.pcl_end_time) << std::endl;
+      img_ready = true;
+    }
+    if(!pl_ready)
+    {
+      if(pcl_buf.empty()) return false;
+      mBuf.lock();
+      double point_begin_time = time_buf[0];
+      double point_end_time = time_buf.back() + pcl_buf.back()->back().curvature;
+      mBuf.unlock();
+      if(point_begin_time > p_imu.pcl_beg_time + 10e-3)
+      {
+        img_ready = false;
+        std::cout << "Reset img_ready!!!"
+        << " p_imu.pcl_beg_time:" << std::to_string(p_imu.pcl_beg_time) << ", p_imu.pcl_end_time:" << std::to_string(p_imu.pcl_end_time)
+        << ", point_begin_time:" << std::to_string(point_begin_time) << ", point_end_time:" << std::to_string(point_end_time) 
+        << std::endl;
+        return false;
+      }
+      if(point_end_time < p_imu.pcl_end_time)
+      {
+        return false;
+      }
+      mBuf.lock();
+
+      std::cout << "Match img-lidar ok!!!"
+        << " p_imu.pcl_beg_time:" << std::to_string(p_imu.pcl_beg_time) << ", p_imu.pcl_end_time:" << std::to_string(p_imu.pcl_end_time)
+        << ", point_begin_time:" << std::to_string(point_begin_time) << ", point_end_time:" << std::to_string(point_end_time) 
+        << std::endl;
+      pl_ptr->clear();
+      int drop_num{0};
+      for(int i=0; i<time_buf.size(); i++)
+      {
+        pcl::PointCloud<PointType>::Ptr cloud_cur = pcl_buf[i];
+        double time_cur = time_buf[i];
+        int j=0;
+        for(; j<cloud_cur->size(); j++)
+        {
+          double time_point = time_cur + cloud_cur->points[j].curvature;
+          if(time_point <= p_imu.pcl_beg_time)
+          {
+            continue;
+          }
+          else if(time_point <= p_imu.pcl_end_time)
+          {
+            pl_ptr->points.push_back(cloud_cur->points[j]);
+            pl_ptr->points.back().curvature = time_point - p_imu.pcl_beg_time;
+          }
+          else
+          {
+            break;
+          }
+        }
+        if(cloud_cur->size() == j)
+        {
+          drop_num++;
+          continue;
+        }
+        else
+        {
+          break;
+        }
+      }
+      std::cout << "drop_num:" << drop_num << std::endl;
+      while(drop_num>0)
+      {
+        pcl_buf.pop_front(); 
+        time_buf.pop_front();
+        drop_num--;
+      }
+      pl_ready = true;
+      mBuf.unlock();
+    }
+  }
+  else
+  {
+    if(!pl_ready)
+    {
+      if(pcl_buf.empty()) return false;
+
+      mBuf.lock();
+      pl_ptr = pcl_buf.front();
+      p_imu.pcl_beg_time = time_buf.front();
+      pcl_buf.pop_front(); time_buf.pop_front();
+      mBuf.unlock();
+
+      p_imu.pcl_end_time = p_imu.pcl_beg_time + pl_ptr->back().curvature;
+      p_imu.img_match_status = 0;
+
+      if(point_notime)
+      {
+        if(last_pcl_time < 0)
+        {
+          last_pcl_time = p_imu.pcl_beg_time;
+          return false;
+        }
+
+        p_imu.pcl_end_time = p_imu.pcl_beg_time;
+        p_imu.pcl_beg_time = last_pcl_time;
+        last_pcl_time = p_imu.pcl_end_time;
+      }
+      std::cout << "p_imu.pcl_beg_time:" << std::to_string(p_imu.pcl_beg_time) << ", p_imu.pcl_end_time:" << std::to_string(p_imu.pcl_end_time) << std::endl;
+
+      p_imu.img_match_status = -2;
+      p_imu.img_match = cv::Mat();
+      pl_ready = true;
+    }
+  }
+
+  if(!pl_ready || imu_last_time <= p_imu.pcl_end_time) return false;
+  mBuf.lock();
+  double imu_time = ROS_TIMESTAMP_TO_SEC(imu_buf.front()->header.stamp);
+  while((!imu_buf.empty()) && (imu_time < p_imu.pcl_end_time)) 
+  {
+    imu_time = ROS_TIMESTAMP_TO_SEC(imu_buf.front()->header.stamp);
+    if(imu_time > p_imu.pcl_end_time) break;
+    imus.push_back(imu_buf.front());
+    imu_buf.pop_front();
+  }
+  mBuf.unlock();
+
+  if(imu_buf.empty())
+  {
+    printf("imu buf empty\n"); exit(0);
+  }
+
+  pl_ready = false;
+  img_ready = false;
+
+  if(imus.size() > 4)
+    return true;
+  else
+    return false;
 }
 
 bool sync_packages(pcl::PointCloud<PointType>::Ptr &pl_ptr, std::deque<RosImuPtr> &imus, IMUEKF &p_imu)
@@ -242,7 +422,7 @@ bool sync_packages(pcl::PointCloud<PointType>::Ptr &pl_ptr, std::deque<RosImuPtr
   }
 
   if(!pl_ready || imu_last_time <= p_imu.pcl_end_time) return false;
-  if(img_time_buf.size()>1 && 0==p_imu.img_match_status)
+  if(img_enable && img_time_buf.size()>1 && 0==p_imu.img_match_status)
   {
     p_imu.img_match_status = -1;
     mBuf.lock();

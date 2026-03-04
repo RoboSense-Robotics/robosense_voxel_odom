@@ -3,6 +3,9 @@ General:
   imu_topic: "/rs_imu"
   img_topic: "/rs_camera/rgb"
   compressed_img_topic: ""
+  sync_mode: 0 # 0: lidar-major; 1: camera-major
+  img_enable: true
+  img_ds_ratio: 3 # Use one img every img_ds_ratio imgs for LVIO, need to be >=1
   # The file path of the map to be saved
   save_path: "/home/sti/Documents/voxel_odom_ws/src/voxel_slam/VoxelSLAM/Log"
   # The offline map in the save_path to be loaded

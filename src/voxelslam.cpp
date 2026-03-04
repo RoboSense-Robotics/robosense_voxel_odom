@@ -439,6 +439,10 @@ public:
     const std::string cfg_odom = cfg_path + "/odom.yaml";
 
     YAML::Node odom_node = YAML::LoadFile(cfg_odom);
+    YamlRead(odom_node["General"], "sync_mode", sync_mode);
+    YamlRead(odom_node["General"], "img_enable", img_enable);
+    YamlRead(odom_node["General"], "img_ds_ratio", img_ds_ratio);
+
     YamlRead(odom_node["General"], "bagname", bagname);
     YamlRead(odom_node["General"], "save_path", savepath);
     map_save_path_ = savepath + "/" + bagname + "/";
@@ -1563,7 +1567,16 @@ public:
       std::deque<RosImuPtr> imus;
 
       t0 = std::chrono::high_resolution_clock::now();
-      if(!sync_packages(pcl_curr, imus, odom_ekf))
+      bool sync_ok{false};
+      if(0 == sync_mode)
+      {
+        sync_ok = sync_packages(pcl_curr, imus, odom_ekf);
+      }
+      else
+      {
+        sync_ok = sync_packages_new(pcl_curr, imus, odom_ekf);
+      }
+      if(!sync_ok)
       {
         t1 = std::chrono::high_resolution_clock::now();
         col_key.push_back("sync_packages");
