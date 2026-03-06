@@ -444,9 +444,50 @@ public:
     YamlRead(odom_node["General"], "img_ds_ratio", img_ds_ratio);
 
     YamlRead(odom_node["General"], "bagname", bagname);
-    YamlRead(odom_node["General"], "save_path", savepath);
+    savepath = std::string(PROJECT_PATH) + "/" + "Log";
     map_save_path_ = savepath + "/" + bagname + "/";
     radius_save_path_ = savepath + "/" + bagname + "/radius/";
+
+    {
+      struct stat st = {0};
+      if(stat(savepath.c_str(), &st) == -1) 
+      {
+        if(mkdir(savepath.c_str(), 0755) == -1) 
+        {
+          printf("Failed to create directory: %s\n", strerror(errno));
+          printf("The logs will be saved in %s.\n", savepath.c_str());
+          printf("So please clear or rename the existed folder.\n"); 
+          exit(1);
+        }
+      }
+    }
+    {
+      
+      struct stat st = {0};
+      if(stat(map_save_path_.c_str(), &st) == -1) 
+      {
+        if(mkdir(map_save_path_.c_str(), 0755) == -1) 
+        {
+          printf("Failed to create directory: %s\n", strerror(errno));
+          printf("The map will be saved in %s.\n", map_save_path_.c_str());
+          printf("So please clear or rename the existed folder.\n"); 
+          exit(1);
+        }
+      }
+    }
+    {
+      struct stat st = {0};
+      if(stat(radius_save_path_.c_str(), &st) == -1) 
+      {
+        if(mkdir(radius_save_path_.c_str(), 0755) == -1) 
+        {
+          printf("Failed to create directory: %s\n", strerror(errno));
+          printf("The radius will be saved in %s.\n", radius_save_path_.c_str());
+          printf("So please clear or rename the existed folder.\n"); 
+          exit(1);
+        }
+      }
+    }
 
     YamlRead(odom_node["General"], "lidar_type", feat.lidar_type);
     YamlRead(odom_node["General"], "blind", feat.blind);
@@ -631,47 +672,6 @@ public:
     noiseWalk.diagonal() << 
     rand_walk_gyr, rand_walk_gyr, rand_walk_gyr, 
     rand_walk_acc, rand_walk_acc, rand_walk_acc;
-
-    {
-      struct stat st = {0};
-      if(stat(savepath.c_str(), &st) == -1) 
-      {
-        if(mkdir(savepath.c_str(), 0755) == -1) 
-        {
-          printf("Failed to create directory: %s\n", strerror(errno));
-          printf("The logs will be saved in %s.\n", savepath.c_str());
-          printf("So please clear or rename the existed folder.\n"); 
-          exit(1);
-        }
-      }
-    }
-    {
-      
-      struct stat st = {0};
-      if(stat(map_save_path_.c_str(), &st) == -1) 
-      {
-        if(mkdir(map_save_path_.c_str(), 0755) == -1) 
-        {
-          printf("Failed to create directory: %s\n", strerror(errno));
-          printf("The map will be saved in %s.\n", map_save_path_.c_str());
-          printf("So please clear or rename the existed folder.\n"); 
-          exit(1);
-        }
-      }
-    }
-    {
-      struct stat st = {0};
-      if(stat(radius_save_path_.c_str(), &st) == -1) 
-      {
-        if(mkdir(radius_save_path_.c_str(), 0755) == -1) 
-        {
-          printf("Failed to create directory: %s\n", strerror(errno));
-          printf("The radius will be saved in %s.\n", radius_save_path_.c_str());
-          printf("So please clear or rename the existed folder.\n"); 
-          exit(1);
-        }
-      }
-    }
 
     sws.resize(thread_num);
     cout << "bagname: " << bagname << endl;
@@ -1725,6 +1725,10 @@ public:
           }
           lidar_odometry_->AddLiDAR(pcl_curr, x_curr.t);
           *pcl_curr = lidar_odometry_->GetValidCloud();
+        }
+        if(pcl_curr->size()<100)
+        {
+          continue;
         }
 
         t0 = std::chrono::high_resolution_clock::now();

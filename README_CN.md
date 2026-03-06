@@ -39,7 +39,7 @@ source install/setup.bash
 ```
 
 ## 4. 运行 robosense_voxel_odom
-
+默认情况下，robosense_voxel_odom 的所有输出都将保存到 ```<ros_workspace>/src/robosense_voxel_odom/Log``` 目录下。
 ### 示例 1
 
 您可以从 [Climbing Spot](https://cdn.robosense.cn/AC_wiki/zuopaotai.zip)下载示例 1 的 ROS2 数据包
@@ -82,8 +82,7 @@ ros2 bag play shuichi
 
 1. 基于示例 1 的配置目录创建新配置目录： ```cd <ros_workspace>/src/robosense_voxel_odom/config && cp -r ac_zuopaotai/ ac```；
 2. 用您设备的标定参数替换 `ac/calibration.yaml` 中的相关标定信息；
-3. 将 `ac/odom.yaml` 中的参数 `lid_topic`/`imu_topic`/`img_topic`/`compressed_img_topic` 设置为您设备的话题名；
-4. 将 `ac/odom.yaml` 中的参数 `save_path` 设置为可访问路径，Voxel-Odom 的所有输出都会保存于此。
+3. 将 `ac/odom.yaml` 中的参数 `lid_topic`/`imu_topic`/`img_topic`/`compressed_img_topic` 设置为您设备的话题名。
 
 #### ROS1
 

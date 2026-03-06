@@ -39,7 +39,7 @@ source install/setup.bash
 ```
 
 ## 4. Run robosense_voxel_odom
-
+By default, all outputs from the robosense_voxel_odom are saved in ```<ros_workspace>/src/robosense_voxel_odom/Log```.
 ### Demo1
 
 Download ros2 bag from: [Climbing Spot](https://cdn.robosense.cn/AC_wiki/zuopaotai.zip)
@@ -76,14 +76,13 @@ ros2 bag play shuichi
 
 ### Run with your device
 
-You need to provide the config folder of your device in `robosense_voxel_odom/config` like ac_zuopaotai folder used in Demo1. 
+You need to provide the config folder of your device in `robosense_voxel_odom/config` like ac_zuopaotai folder used in Demo1.
 
 If you can get a Active Camera, you can setup your config-folder as following:
 
 1. Create config folder from demo1 config folder :```cd <ros_workspace>/src/robosense_voxel_odom/config && cp -r ac_zuopaotai/ ac```;
 2. Replace calibration info in the `ac/calibration.yaml` with your device calibration parameters;
-3. Set the `lid_topic`/`imu_topic`/`img_topic`/`compressed_img_topic` in the `ac/odom.yaml` to your topic names;
-4. Set the `save_path` in the `ac/odom.yaml` to an accessible path, and all the outputs of the robosense_voxel_odom will be saved there.
+3. Set the `lid_topic`/`imu_topic`/`img_topic`/`compressed_img_topic` in the `ac/odom.yaml` to your topic names.
 
 #### ROS1
 

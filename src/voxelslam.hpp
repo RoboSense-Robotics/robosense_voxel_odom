@@ -263,10 +263,11 @@ bool sync_packages_new(pcl::PointCloud<PointType>::Ptr &pl_ptr, std::deque<RosIm
       double point_begin_time = time_buf[0];
       double point_end_time = time_buf.back() + pcl_buf.back()->back().curvature;
       mBuf.unlock();
-      if(point_begin_time > p_imu.pcl_beg_time + 10e-3)
+      if(point_begin_time >= p_imu.pcl_end_time)
       {
         img_ready = false;
-        std::cout << "Reset img_ready!!!"
+        last_pcl_time = p_imu.pcl_beg_time;
+        std::cout << "Reset img_ready due to mismatch time range!!!"
         << " p_imu.pcl_beg_time:" << std::to_string(p_imu.pcl_beg_time) << ", p_imu.pcl_end_time:" << std::to_string(p_imu.pcl_end_time)
         << ", point_begin_time:" << std::to_string(point_begin_time) << ", point_end_time:" << std::to_string(point_end_time) 
         << std::endl;
@@ -317,6 +318,17 @@ bool sync_packages_new(pcl::PointCloud<PointType>::Ptr &pl_ptr, std::deque<RosIm
         }
       }
       std::cout << "drop_num:" << drop_num << std::endl;
+      if(pl_ptr->size()<100)
+      {
+        img_ready = false;
+        last_pcl_time = p_imu.pcl_beg_time;
+        std::cout << "Reset img_ready due to too few points!!!"
+        << " p_imu.pcl_beg_time:" << std::to_string(p_imu.pcl_beg_time) << ", p_imu.pcl_end_time:" << std::to_string(p_imu.pcl_end_time)
+        << ", point_begin_time:" << std::to_string(point_begin_time) << ", point_end_time:" << std::to_string(point_end_time) 
+        << std::endl;
+        mBuf.unlock();
+        return false;
+      }
       while(drop_num>0)
       {
         pcl_buf.pop_front(); 
