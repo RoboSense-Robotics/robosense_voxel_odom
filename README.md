@@ -83,7 +83,7 @@ If you can get a Active Camera, you can setup your config-folder as following:
 1. Create config folder from demo1 config folder :```cd <ros_workspace>/src/voxel_odom/config && cp -r ac_zuopaotai/ ac```;
 2. Replace calibration info in the `ac/calibration.yaml` with your device calibration parameters;
 3. Set the `lid_topic`/`imu_topic`/`img_topic`/`compressed_img_topic` in the `ac/odom.yaml` to your topic names;
-4. Set the `save_path` in the `ac/odom.yaml` to an path accessible, and all the outputs of the Voxel-Odom will be saved there.
+4. Set the `save_path` in the `ac/odom.yaml` to an accessible path, and all the outputs of the Voxel-Odom will be saved there.
 
 #### ROS1
 
