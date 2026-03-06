@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(voxel_odom)
+project(robosense_voxel_odom)
 
 set(CMAKE_BUILD_TYPE "Release")
 

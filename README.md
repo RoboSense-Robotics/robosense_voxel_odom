@@ -1,10 +1,10 @@
-# Voxel-Odom: A LiDAR-Visual-Inertial Odom System
+# robosense_voxel_odom: A LiDAR-Visual-Inertial Odom System
 
 [中文版](README_CN.md)
 
 ## 1. Introduction
 
-**Voxel-Odom** is a modified version of **[Voxel-SLAM](https://github.com/hku-mars/Voxel-SLAM)** with enhanced odometry and removed backend components, adapted for the Active Camera. It can be initialized with static state and dynamic state. You can run it in LiDAR-Inertial Odometry mode or LiDAR-Visual-Inertial Odometry mode. This respository supports both ROS1 and ROS2.
+**robosense_voxel_odom** is a modified version of **[Voxel-SLAM](https://github.com/hku-mars/Voxel-SLAM)** with enhanced odometry and removed backend components, adapted for the Active Camera. It can be initialized with static state and dynamic state. You can run it in LiDAR-Inertial Odometry mode or LiDAR-Visual-Inertial Odometry mode. This respository supports both ROS1 and ROS2.
 
 ## 2. Prerequisited
 
@@ -24,7 +24,7 @@
 
 ```sh
 cd <ros_workspace>/src
-git clone https://github.com/RoboSense-Robotics/Voxel-Odom
+git clone https://github.com/RoboSense-Robotics/robosense_voxel_odom
 cd ../ && catkin build -v -i
 source devel/setup.bash
 ```
@@ -33,12 +33,12 @@ source devel/setup.bash
 
 ```sh
 cd <ros_workspace>/src
-git clone https://github.com/RoboSense-Robotics/Voxel-Odom
+git clone https://github.com/RoboSense-Robotics/robosense_voxel_odom
 cd ../ && colcon build --symlink-install --event-handlers console_direct+
 source install/setup.bash
 ```
 
-## 4. Run Voxel-Odom
+## 4. Run robosense_voxel_odom
 
 ### Demo1
 
@@ -48,9 +48,9 @@ Download ros2 bag from: [Climbing Spot](https://cdn.robosense.cn/AC_wiki/zuopaot
 # terminal 1 to run odom
 cd <ros_workspace>
 source install/setup.bash
-ros2 run voxel_odom voxelodom ac_zuopaotai  
+ros2 run robosense_voxel_odom voxelodom ac_zuopaotai  
 # terminal 2 to run rviz
-cd <ros_workspace>/src/voxel_odom/rviz_cfg
+cd <ros_workspace>/src/robosense_voxel_odom/rviz_cfg
 rviz2 -d ac_ros2.rviz
 # terminal 3 to play ros2 bag
 cd <demo1’s_download_location‌>
@@ -65,9 +65,9 @@ Download ros2 bag from: [European architecture](https://cdn.robosense.cn/AC_wiki
 # terminal 1 to run odom
 cd <ros_workspace>
 source install/setup.bash
-ros2 run voxel_odom voxelodom ac_shuichi  
+ros2 run robosense_voxel_odom voxelodom ac_shuichi  
 # terminal 2 to run rviz
-cd <ros_workspace>/src/voxel_odom/rviz_cfg
+cd <ros_workspace>/src/robosense_voxel_odom/rviz_cfg
 rviz2 -d ac_ros2.rviz
 # terminal 3 to play ros2 bag
 cd <demo2’s_download_location‌>
@@ -76,14 +76,14 @@ ros2 bag play shuichi
 
 ### Run with your device
 
-You need to provide the config folder of your device in `voxel_odom/config` like ac_zuopaotai folder used in Demo1. 
+You need to provide the config folder of your device in `robosense_voxel_odom/config` like ac_zuopaotai folder used in Demo1. 
 
 If you can get a Active Camera, you can setup your config-folder as following:
 
-1. Create config folder from demo1 config folder :```cd <ros_workspace>/src/voxel_odom/config && cp -r ac_zuopaotai/ ac```;
+1. Create config folder from demo1 config folder :```cd <ros_workspace>/src/robosense_voxel_odom/config && cp -r ac_zuopaotai/ ac```;
 2. Replace calibration info in the `ac/calibration.yaml` with your device calibration parameters;
 3. Set the `lid_topic`/`imu_topic`/`img_topic`/`compressed_img_topic` in the `ac/odom.yaml` to your topic names;
-4. Set the `save_path` in the `ac/odom.yaml` to an accessible path, and all the outputs of the Voxel-Odom will be saved there.
+4. Set the `save_path` in the `ac/odom.yaml` to an accessible path, and all the outputs of the robosense_voxel_odom will be saved there.
 
 #### ROS1
 
@@ -91,9 +91,9 @@ If you can get a Active Camera, you can setup your config-folder as following:
 # terminal 1 to run odom
 cd <ros_workspace>
 source devel/setup.bash
-rosrun voxel_odom voxelodom ac 
+rosrun robosense_voxel_odom voxelodom ac 
 # terminal 2 to run rviz
-cd <ros_workspace>/src/voxel_odom/rviz_cfg
+cd <ros_workspace>/src/robosense_voxel_odom/rviz_cfg
 rviz -d ac.rviz
 # terminal 3 to play ros1 bag
 rosbag play <your_ros1_bag>
@@ -105,9 +105,9 @@ rosbag play <your_ros1_bag>
 # terminal 1 to run odom
 cd <ros_workspace>
 source install/setup.bash
-ros2 run voxel_odom voxelodom ac  
+ros2 run robosense_voxel_odom voxelodom ac  
 # terminal 2 to run rviz
-cd <ros_workspace>/src/voxel_odom/rviz_cfg
+cd <ros_workspace>/src/robosense_voxel_odom/rviz_cfg
 rviz2 -d ac_ros2.rviz
 # terminal 3 to play ros2 bag
 ros2 bag play <your_ros2_bag>

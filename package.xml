@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>voxel_odom</name>
+  <name>robosense_voxel_odom</name>
   <version>1.0.0</version>
   <description>A modified version of Voxel-SLAM with enhanced odometry and removed backend components, adapted for the Active Camera</description>
   <maintainer email="silence.song@robosense.cn">Silence Song</maintainer>
